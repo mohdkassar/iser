@@ -1,0 +1,34 @@
+const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:4000";
+async function request(path, init) {
+    const response = await fetch(`${API_BASE}${path}`, {
+        headers: {
+            "Content-Type": "application/json",
+        },
+        ...init,
+    });
+    if (!response.ok) {
+        throw new Error(`Request failed for ${path}`);
+    }
+    return (await response.json());
+}
+export const adminApi = {
+    listClients: () => request("/api/admin/clients"),
+    getClient: (clientId) => request(`/api/admin/clients/${clientId}`),
+    getSite: (siteId) => request(`/api/admin/sites/${siteId}`),
+    extractMetadata: (siteId, body) => request(`/api/admin/sites/${siteId}/metadata/extract`, {
+        method: "POST",
+        body: JSON.stringify(body),
+    }),
+    runRoomClustering: (siteId) => request(`/api/admin/sites/${siteId}/clusters/rooms/run`, {
+        method: "POST",
+    }),
+    runDeviceClustering: (siteId) => request(`/api/admin/sites/${siteId}/clusters/devices/run`, {
+        method: "POST",
+    }),
+    runClustering: (siteId) => request(`/api/admin/sites/${siteId}/clusters/run`, { method: "POST" }),
+    clearSiteClustersAndMetadata: (siteId) => request(`/api/admin/sites/${siteId}/clusters/clear`, { method: "POST" }),
+    updateCluster: (clusterId, body) => request(`/api/admin/clusters/${clusterId}`, {
+        method: "PATCH",
+        body: JSON.stringify(body),
+    }),
+};
