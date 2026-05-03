@@ -68,7 +68,12 @@ adminRouter.post("/sites/:siteId/clusters/run", async (request, response) => {
 });
 
 adminRouter.post("/sites/:siteId/clusters/rooms/run", async (request, response) => {
-  const result = await runRoomClustering(request.params.siteId);
+  const threshold =
+    typeof request.body?.threshold === "number" && Number.isFinite(request.body.threshold)
+      ? Math.min(1, Math.max(0, request.body.threshold))
+      : undefined;
+
+  const result = await runRoomClustering(request.params.siteId, { threshold });
   if (!result) {
     response.status(404).json({ message: "Site not found" });
     return;

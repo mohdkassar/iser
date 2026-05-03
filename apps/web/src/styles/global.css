@@ -129,6 +129,34 @@ button {
   font-size: 0.9rem;
 }
 
+.cluster-action {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.threshold-control {
+  display: grid;
+  gap: 6px;
+  width: 96px;
+}
+
+.threshold-control span {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+.threshold-control input {
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.08);
+  color: inherit;
+  padding: 7px 11px;
+}
+
 .extract-action {
   display: grid;
   gap: 6px;

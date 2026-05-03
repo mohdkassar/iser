@@ -5,6 +5,7 @@ import type {
   ExtractMetadataInput,
   ExtractMetadataResponse,
   RunClusteringResponse,
+  RunRoomClusteringInput,
   SiteDetail,
   UpdateClusterInput,
 } from "@iser/shared";
@@ -35,9 +36,10 @@ export const adminApi = {
       method: "POST",
       body: JSON.stringify(body),
     }),
-  runRoomClustering: (siteId: string) =>
+  runRoomClustering: (siteId: string, body: RunRoomClusteringInput) =>
     request<RunClusteringResponse>(`/api/admin/sites/${siteId}/clusters/rooms/run`, {
       method: "POST",
+      body: JSON.stringify(body),
     }),
   runDeviceClustering: (siteId: string) =>
     request<RunClusteringResponse>(`/api/admin/sites/${siteId}/clusters/devices/run`, {

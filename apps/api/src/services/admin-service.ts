@@ -6,6 +6,7 @@ import type {
   ExtractMetadataInput,
   ExtractMetadataResponse,
   RunClusteringResponse,
+  RunRoomClusteringInput,
   SiteDetail,
   SiteSummary,
   UpdateClusterInput,
@@ -281,9 +282,16 @@ export async function runClustering(siteId: string): Promise<RunClusteringRespon
   return runRoomClustering(siteId);
 }
 
-export async function runRoomClustering(siteId: string): Promise<RunClusteringResponse | null> {
+export async function runRoomClustering(
+  siteId: string,
+  input: RunRoomClusteringInput = {},
+): Promise<RunClusteringResponse | null> {
   const site = await SiteModel.findById(siteId).lean();
   if (!site) return null;
+  const threshold =
+    typeof input.threshold === "number" && Number.isFinite(input.threshold)
+      ? Math.min(1, Math.max(0, input.threshold))
+      : 0.5;
 
   const datapoints = await DatapointModel.find({ siteId }).lean();
   const enrichedDatapoints = datapoints
@@ -292,7 +300,7 @@ export async function runRoomClustering(siteId: string): Promise<RunClusteringRe
       Boolean(datapoint.metadata),
     );
 
-  const roomClusters = buildRoomClusters(enrichedDatapoints);
+  const roomClusters = buildRoomClusters(enrichedDatapoints, threshold);
   const roomClusterDocuments = toRoomClusterDocuments(siteId, roomClusters);
 
   await ClusterModel.deleteMany({ siteId });

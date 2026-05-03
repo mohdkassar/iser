@@ -19,8 +19,9 @@ export const adminApi = {
         method: "POST",
         body: JSON.stringify(body),
     }),
-    runRoomClustering: (siteId) => request(`/api/admin/sites/${siteId}/clusters/rooms/run`, {
+    runRoomClustering: (siteId, body) => request(`/api/admin/sites/${siteId}/clusters/rooms/run`, {
         method: "POST",
+        body: JSON.stringify(body),
     }),
     runDeviceClustering: (siteId) => request(`/api/admin/sites/${siteId}/clusters/devices/run`, {
         method: "POST",

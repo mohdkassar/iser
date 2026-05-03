@@ -40,15 +40,17 @@ function mergeRoomClusterInto(target: RoomCluster, source: RoomCluster) {
   }
 }
 
-function shouldMergeRoomClusters(a: RoomCluster, b: RoomCluster) {
+const defaultRoomSimilarityThreshold = 0.5;
+
+function shouldMergeRoomClusters(a: RoomCluster, b: RoomCluster, threshold: number) {
   if (a.canonicalName !== "unassigned" && a.canonicalName === b.canonicalName) {
     return true;
   }
 
-  return cosineSimilarity(a.aliases, b.aliases) >= 0.3;
+  return cosineSimilarity(a.aliases, b.aliases) >= threshold;
 }
 
-function consolidateRoomClusters(clusters: RoomCluster[]) {
+function consolidateRoomClusters(clusters: RoomCluster[], threshold: number) {
   const consolidated = [...clusters];
   let merged = true;
 
@@ -60,7 +62,7 @@ function consolidateRoomClusters(clusters: RoomCluster[]) {
         const leftCluster = consolidated[leftIndex]!;
         const rightCluster = consolidated[rightIndex]!;
 
-        if (!shouldMergeRoomClusters(leftCluster, rightCluster)) {
+        if (!shouldMergeRoomClusters(leftCluster, rightCluster, threshold)) {
           continue;
         }
 
@@ -82,7 +84,10 @@ function consolidateRoomClusters(clusters: RoomCluster[]) {
   }));
 }
 
-export function buildRoomClusters(datapoints: DatapointSummary[]) {
+export function buildRoomClusters(
+  datapoints: DatapointSummary[],
+  threshold = defaultRoomSimilarityThreshold,
+) {
   const clusters: RoomCluster[] = [];
 
   for (const datapoint of datapoints) {
@@ -97,7 +102,7 @@ export function buildRoomClusters(datapoints: DatapointSummary[]) {
     let matchedCluster = clusters.find((cluster) => cluster.canonicalName === normalizedRoom);
 
     if (!matchedCluster) {
-      matchedCluster = clusters.find((cluster) => cosineSimilarity(cluster.aliases, aliases) >= 0.3);
+      matchedCluster = clusters.find((cluster) => cosineSimilarity(cluster.aliases, aliases) >= threshold);
     }
 
     if (!matchedCluster) {
@@ -114,7 +119,7 @@ export function buildRoomClusters(datapoints: DatapointSummary[]) {
     matchedCluster.datapoints.push(datapoint);
   }
 
-  return consolidateRoomClusters(clusters);
+  return consolidateRoomClusters(clusters, threshold);
 }
 
 export function toRoomClusterDocuments(

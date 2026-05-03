@@ -11,6 +11,10 @@ export interface RunClusteringResponse {
   clusters: ClusterSummary[];
 }
 
+export interface RunRoomClusteringInput {
+  threshold?: number;
+}
+
 export interface ExtractMetadataResponse {
   site: SiteSummary;
   datapoints: DatapointSummary[];

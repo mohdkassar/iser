@@ -35,6 +35,7 @@ export function App() {
     useState<MetadataExtractionVersion>("v1");
   const [metadataBatchSize, setMetadataBatchSize] = useState(5);
   const [datapointSearch, setDatapointSearch] = useState("");
+  const [roomClusteringThreshold, setRoomClusteringThreshold] = useState(0.5);
 
   const filteredDatapoints = useMemo(() => {
     const datapoints = siteDetail?.datapoints ?? [];
@@ -286,14 +287,32 @@ export function App() {
           subtitle={siteDetail ? `${filteredClusters.length} of ${siteDetail.clusters.length} shown` : "No site selected"}
           action={
             selectedSiteId ? (
-              <button
-                className="primary-button panel-action-button"
-                type="button"
-                onClick={() => void runRoomClustering()}
-                disabled={isRunningRoomClustering}
-              >
-                {isRunningRoomClustering ? "Clustering rooms..." : "Run room clustering"}
-              </button>
+              <div className="cluster-action">
+                <label className="threshold-control">
+                  <span>Threshold</span>
+                  <input
+                    type="number"
+                    min={0}
+                    max={1}
+                    step={0.05}
+                    value={roomClusteringThreshold}
+                    onChange={(event) =>
+                      setRoomClusteringThreshold(
+                        Math.min(1, Math.max(0, Number.parseFloat(event.target.value || "0"))),
+                      )
+                    }
+                    disabled={isRunningRoomClustering}
+                  />
+                </label>
+                <button
+                  className="primary-button panel-action-button"
+                  type="button"
+                  onClick={() => void runRoomClustering(roomClusteringThreshold)}
+                  disabled={isRunningRoomClustering}
+                >
+                  {isRunningRoomClustering ? "Clustering rooms..." : "Run room clustering"}
+                </button>
+              </div>
             ) : null
           }
         >

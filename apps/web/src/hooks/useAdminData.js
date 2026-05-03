@@ -82,12 +82,12 @@ export function useAdminData() {
     async function runClustering() {
         await runRoomClustering();
     }
-    async function runRoomClustering() {
+    async function runRoomClustering(threshold = 0.5) {
         if (!selectedSiteId)
             return;
         setIsRunningRoomClustering(true);
         try {
-            await adminApi.runRoomClustering(selectedSiteId);
+            await adminApi.runRoomClustering(selectedSiteId, { threshold });
             await refreshClient();
             await refreshSite();
         }
