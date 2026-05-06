@@ -1,6 +1,7 @@
 import datapointsSeed from "../../../../docs/iser.datapoints.json" with { type: "json" };
 import datapointsSeed2 from "../../../../docs/iser.datapoints2.json" with { type: "json" };
 import datapointsSeed3 from "../../../../docs/iser.datapoints3.json" with { type: "json" };
+import datapointsSeed4 from "../../../../docs/iser.datapoints4.json" with { type: "json" };
 
 import { ClientModel } from "../models/client.js";
 import { ClusterModel } from "../models/cluster.js";
@@ -18,7 +19,7 @@ export async function seedDevelopmentData() {
     slug: "northstar-indoor",
   });
 
-  const [siteA, siteB, siteC] = await SiteModel.create([
+  const [siteA, siteB, siteC, siteD] = await SiteModel.create([
     {
       clientId: client._id,
       name: "Bristol Facility",
@@ -35,6 +36,12 @@ export async function seedDevelopmentData() {
       clientId: client._id,
       name: "Manchester Facility",
       code: "MAN-03",
+      metadataExtractionTokensTotal: 0,
+    },
+    {
+      clientId: client._id,
+      name: "Sheffield Facility",
+      code: "SHF-04",
       metadataExtractionTokensTotal: 0,
     }
   ]);
@@ -60,6 +67,15 @@ export async function seedDevelopmentData() {
   await DatapointModel.create(
     datapointsSeed3.map((datapoint) => ({
       siteId: siteC._id,
+      rawName: datapoint.rawName,
+      identifier: datapoint.identifier,
+      manufacturer: datapoint.manufacturer,
+    })),
+  );
+
+  await DatapointModel.create(
+    datapointsSeed4.map((datapoint) => ({
+      siteId: siteD._id,
       rawName: datapoint.rawName,
       identifier: datapoint.identifier,
       manufacturer: datapoint.manufacturer,
