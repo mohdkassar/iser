@@ -1,1 +1,1 @@
-{"root":["./src/main.tsx","./src/api/admin.ts","./src/components/clustercard.tsx","./src/components/panel.tsx","./src/components/selectablelist.tsx","./src/hooks/useadmindata.ts","./src/pages/app.tsx","./src/types/components.ts"],"version":"5.9.3"}
+{"root":["./src/main.tsx","./src/api/admin.ts","./src/components/clustercard.tsx","./src/components/panel.tsx","./src/components/selectablelist.tsx","./src/hooks/useadmindata.ts","./src/pages/app.tsx","./src/pages/roompage.tsx","./src/pages/synthetictelemetrypage.tsx","./src/types/components.ts"],"version":"5.9.3"}

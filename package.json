@@ -11,6 +11,7 @@
     "dev": "npm run dev --workspaces --if-present",
     "build": "npm run build --workspaces --if-present",
     "evaluate:metadata": "npm run evaluate:metadata -w apps/api --",
+    "generate:telemetry": "npm run generate:telemetry -w apps/api --",
     "test": "npm run test --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present"
   },

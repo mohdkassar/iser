@@ -3,6 +3,7 @@ export type ClusterStatus = "pending" | "approved" | "rejected";
 export type MetadataExtractionVersion = "v1" | "v2" | "v3";
 
 export interface ExtractedMetadata {
+  humanReadableName: string;
   roomCandidate: string;
   roomAliases: string[];
   equipmentGroup?: string;

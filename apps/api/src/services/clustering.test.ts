@@ -14,6 +14,7 @@ test("buildRoomClusters groups datapoints with similar room aliases", () => {
       metadata: {
         roomCandidate: "grow_room_a",
         roomAliases: ["GRM-A", "GrowA"],
+        humanReadableName: "Grow Room A Air Handling Unit 1 Temperature",
         equipmentGroup: "ahu",
         deviceInstance: "ahu1",
         deviceType: "temperature",
@@ -30,6 +31,7 @@ test("buildRoomClusters groups datapoints with similar room aliases", () => {
       metadata: {
         roomCandidate: "grow room a",
         roomAliases: ["GrowA", "RoomA"],
+        humanReadableName: "Grow Room A Humidity Sensor",
         equipmentGroup: "ahu",
         deviceInstance: "ahu1",
         deviceType: "humidity",
@@ -54,6 +56,7 @@ test("buildRoomClusters consolidates clusters that only become mergeable after t
       metadata: {
         roomCandidate: "grow_room_a",
         roomAliases: ["grm a"],
+        humanReadableName: "Grow Room A Supply Air Temperature",
         equipmentGroup: "ahu",
         deviceInstance: "ahu1",
         deviceType: "temperature",
@@ -69,6 +72,7 @@ test("buildRoomClusters consolidates clusters that only become mergeable after t
       manufacturer: "Acme",
       metadata: {
         roomCandidate: "grow room a",
+        humanReadableName: "Grow Room A AHU",
         roomAliases: ["growa", "room a"],
         equipmentGroup: "ahu",
         deviceInstance: "ahu1",
@@ -85,6 +89,7 @@ test("buildRoomClusters consolidates clusters that only become mergeable after t
       manufacturer: "Acme",
       metadata: {
         roomCandidate: "room a",
+        humanReadableName: "Room A CO2 Sensor",
         roomAliases: ["grm a", "growa", "room a"],
         equipmentGroup: "sensor",
         deviceInstance: "co2-1",

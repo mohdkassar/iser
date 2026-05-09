@@ -4,8 +4,13 @@ import type {
   ClusterSummary,
   ExtractMetadataInput,
   ExtractMetadataResponse,
+  GenerateSyntheticTelemetryInput,
+  GenerateSyntheticTelemetryResponse,
+  RoomAgentRequest,
+  RoomAgentResponse,
   RunClusteringResponse,
   RunRoomClusteringInput,
+  MergeRoomClustersInput,
   SiteDetail,
   UpdateClusterInput,
 } from "@iser/shared";
@@ -49,9 +54,24 @@ export const adminApi = {
     request<RunClusteringResponse>(`/api/admin/sites/${siteId}/clusters/run`, { method: "POST" }),
   clearSiteClustersAndMetadata: (siteId: string) =>
     request<SiteDetail>(`/api/admin/sites/${siteId}/clusters/clear`, { method: "POST" }),
+  generateSyntheticTelemetry: (siteId: string, body: GenerateSyntheticTelemetryInput) =>
+    request<GenerateSyntheticTelemetryResponse>(`/api/admin/sites/${siteId}/telemetry/generate`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+  askRoomAgent: (siteId: string, clusterId: string, body: RoomAgentRequest) =>
+    request<RoomAgentResponse>(`/api/admin/sites/${siteId}/rooms/${clusterId}/agent`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
   updateCluster: (clusterId: string, body: UpdateClusterInput) =>
     request<ClusterSummary>(`/api/admin/clusters/${clusterId}`, {
       method: "PATCH",
+      body: JSON.stringify(body),
+    }),
+  mergeRoomClusters: (clusterId: string, body: MergeRoomClustersInput) =>
+    request<SiteDetail>(`/api/admin/clusters/${clusterId}/merge`, {
+      method: "POST",
       body: JSON.stringify(body),
     }),
 };

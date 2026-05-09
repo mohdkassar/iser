@@ -26,4 +26,8 @@ export type ClusterCardProps = {
   onApprove: () => Promise<void>;
   onReject: () => Promise<void>;
   onRename: (label: string) => Promise<void>;
+  onMerge: (sourceClusterId: string, targetClusterId: string) => Promise<void>;
+  draggingClusterId: string | null;
+  onDragStart: (clusterId: string) => void;
+  onDragEnd: () => void;
 };

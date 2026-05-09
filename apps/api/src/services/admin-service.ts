@@ -19,7 +19,13 @@ import { DatapointModel } from "../models/datapoint.js";
 import { SiteModel } from "../models/site.js";
 import { toDeviceClusterDocuments } from "./device-clustering.js";
 import { extractMetadata, extractMetadataBatch, extractRoomMetadataBatch } from "./metadata-extractor.js";
+import { askRoomAgent as askRoomAgentService } from "./room-agent.js";
+import { generateSyntheticTelemetry as generateSyntheticTelemetryService } from "./telemetry-generation.js";
 import { buildRoomClusters, toRoomClusterDocuments } from "./room-clustering.js";
+
+type MergeRoomClustersInput = {
+  sourceClusterId: string;
+};
 
 function toId(value: unknown) {
   return String(value);
@@ -392,3 +398,67 @@ export async function updateCluster(clusterId: string, input: UpdateClusterInput
 
   return cluster ? toClusterSummary(cluster) : null;
 }
+
+function toAliasList(metadata: Record<string, unknown> | undefined) {
+  const aliases = metadata?.aliases;
+  return Array.isArray(aliases)
+    ? aliases.filter((alias): alias is string => typeof alias === "string" && alias.trim().length > 0)
+    : [];
+}
+
+export async function mergeRoomClusters(
+  targetClusterId: string,
+  input: MergeRoomClustersInput,
+): Promise<SiteDetail | null> {
+  const [targetCluster, sourceCluster] = await Promise.all([
+    ClusterModel.findById(targetClusterId),
+    ClusterModel.findById(input.sourceClusterId),
+  ]);
+
+  if (!targetCluster || !sourceCluster) {
+    return null;
+  }
+
+  if (String(targetCluster.siteId) !== String(sourceCluster.siteId)) {
+    throw new Error("Clusters must belong to the same site");
+  }
+
+  if (targetCluster.type !== "room" || sourceCluster.type !== "room") {
+    throw new Error("Only room clusters can be merged");
+  }
+
+  if (targetCluster.status !== "pending" || sourceCluster.status !== "pending") {
+    throw new Error("Only pending room clusters can be merged");
+  }
+
+  if (String(targetCluster._id) === String(sourceCluster._id)) {
+    throw new Error("Cannot merge a cluster into itself");
+  }
+
+  const mergedDatapointIds = Array.from(
+    new Set([...targetCluster.datapointIds, ...sourceCluster.datapointIds].map(toId)),
+  );
+  const targetMetadata = (targetCluster.metadata ?? {}) as Record<string, unknown>;
+  const sourceMetadata = (sourceCluster.metadata ?? {}) as Record<string, unknown>;
+  const mergedAliases = Array.from(new Set([...toAliasList(targetMetadata), ...toAliasList(sourceMetadata)]));
+  const mergedMetadata = {
+    ...targetMetadata,
+    aliases: mergedAliases,
+  };
+
+  await ClusterModel.updateOne(
+    { _id: targetCluster._id },
+    {
+      $set: {
+        datapointIds: mergedDatapointIds,
+        metadata: mergedMetadata,
+      },
+    },
+  );
+  await ClusterModel.deleteOne({ _id: sourceCluster._id });
+
+  return getSiteDetail(String(targetCluster.siteId));
+}
+
+export const generateSyntheticTelemetry = generateSyntheticTelemetryService;
+export const askRoomAgent = askRoomAgentService;

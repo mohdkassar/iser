@@ -1,6 +1,7 @@
 import { createApp } from "./app.js";
 import { env } from "./config/env.js";
 import { connectToDatabase } from "./lib/mongoose.js";
+import "./models/datapoint-telemetry.js";
 import { seedDevelopmentData } from "./seed/dev-seed.js";
 
 async function bootstrap() {

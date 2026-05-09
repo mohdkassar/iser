@@ -369,6 +369,25 @@ button {
   background: rgba(239, 194, 130, 0.08);
 }
 
+.cluster-card[draggable="true"] {
+  cursor: grab;
+}
+
+.cluster-card.is-dragging {
+  opacity: 0.65;
+  transform: scale(0.99);
+}
+
+.cluster-card.is-drop-target {
+  border-color: #4ca678;
+  background: rgba(76, 166, 120, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(76, 166, 120, 0.45);
+}
+
+.cluster-card.is-drop-target .cluster-card__toggle {
+  cursor: copy;
+}
+
 .badge--approved {
   background: rgba(76, 166, 120, 0.2);
 }
@@ -512,6 +531,373 @@ button {
   opacity: 0.7;
 }
 
+.cluster-card__view-link {
+  display: block;
+  text-align: center;
+  margin-top: 10px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.06);
+  color: inherit;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: background 120ms ease;
+}
+
+.cluster-card__view-link:hover {
+  background: rgba(239, 194, 130, 0.14);
+  border-color: #efc282;
+}
+
+.room-page__back {
+  margin-bottom: 20px;
+}
+
+.room-page__back a {
+  display: inline-block;
+  text-decoration: none;
+}
+
+.room-page__header {
+  padding: 18px 22px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 28px;
+  background: rgba(6, 13, 17, 0.5);
+  backdrop-filter: blur(18px);
+  margin-bottom: 20px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(260px, 0.9fr);
+  gap: 18px 28px;
+  align-items: start;
+}
+
+.room-page__header h1 {
+  margin: 0;
+}
+
+.room-page__header-main {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+}
+
+.room-page__header-details {
+  display: grid;
+  gap: 12px;
+  justify-items: start;
+  align-content: start;
+}
+
+.room-page__header-stat {
+  display: grid;
+  gap: 2px;
+}
+
+.room-page__header-stat span,
+.room-page__aliases-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.room-page__header-stat strong {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.room-page__header-details .room-page__badges {
+  margin-bottom: 0;
+}
+
+.room-page__header-details .empty-state {
+  margin: 0;
+}
+
+.room-page__aliases {
+  margin-top: 4px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: grid;
+  gap: 8px;
+}
+
+.room-page__badges {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.room-page__content {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.room-page__toolbar {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.room-page__search {
+  width: 100%;
+}
+
+.room-page__filters {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.room-page__datapoints {
+  display: grid;
+  gap: 12px;
+}
+
+.room-page__panel--agent {
+  width: 100%;
+}
+
+.room-agent__usage {
+  opacity: 0.7;
+}
+
+.room-agent__messages {
+  display: grid;
+  gap: 12px;
+  max-height: 520px;
+  overflow: auto;
+  margin-bottom: 16px;
+  padding-right: 4px;
+}
+
+.room-agent__message {
+  display: grid;
+  gap: 6px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.room-agent__message--assistant {
+  background: rgba(239, 194, 130, 0.08);
+  border-color: rgba(239, 194, 130, 0.18);
+}
+
+.room-agent__message--user {
+  background: rgba(76, 166, 120, 0.08);
+  border-color: rgba(76, 166, 120, 0.18);
+}
+
+.room-agent__role {
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.room-agent__message p {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.room-agent__composer {
+  display: grid;
+  gap: 12px;
+}
+
+.room-agent__field {
+  display: grid;
+  gap: 6px;
+}
+
+.room-agent__field span {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+.room-agent__field textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 120px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.08);
+  color: inherit;
+  padding: 12px 14px;
+}
+
+.room-agent__field textarea::placeholder {
+  color: rgba(246, 244, 236, 0.45);
+}
+
+.room-agent__actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.room-page__datapoint {
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.room-page__datapoint.is-expanded {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(239, 194, 130, 0.22);
+}
+
+.room-page__datapoint-toggle {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+}
+
+.room-page__datapoint-header {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.room-page__datapoint-header span,
+.room-page__datapoint-header small {
+  display: block;
+  opacity: 0.75;
+}
+
+.room-page__datapoint-chevron {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.75;
+  padding-top: 2px;
+}
+
+.room-page__datapoint-summary {
+  margin: 12px 0 0;
+  opacity: 0.75;
+}
+
+.room-page__datapoint .metadata-grid {
+  margin-top: 14px;
+}
+
+.telemetry-page .hero__status {
+  align-items: center;
+}
+
+.telemetry-page__form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  gap: 20px;
+}
+
+.telemetry-page__config,
+.telemetry-page__datapoints {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+}
+
+.telemetry-page__config {
+  padding-right: 6px;
+}
+
+.telemetry-field {
+  display: grid;
+  gap: 6px;
+}
+
+.telemetry-field span {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+.telemetry-field input,
+.telemetry-field select {
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.08);
+  color: inherit;
+  padding: 10px 12px;
+}
+
+.telemetry-field--wide {
+  grid-column: 1 / -1;
+}
+
+.telemetry-page__actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.telemetry-page__datapoint-list {
+  display: grid;
+  gap: 10px;
+  max-height: 560px;
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.telemetry-page__datapoint {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.telemetry-page__datapoint input {
+  margin-top: 4px;
+}
+
+.telemetry-page__datapoint strong,
+.telemetry-page__datapoint span,
+.telemetry-page__datapoint small {
+  display: block;
+}
+
+.telemetry-page__datapoint span,
+.telemetry-page__datapoint small {
+  opacity: 0.75;
+}
+
+.telemetry-summary {
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(76, 166, 120, 0.2);
+  background: rgba(76, 166, 120, 0.12);
+  display: grid;
+  gap: 6px;
+}
+
+.telemetry-summary p {
+  margin: 0;
+}
+
 @media (max-width: 960px) {
   .app-shell {
     padding: 18px;
@@ -531,6 +917,14 @@ button {
   }
 
   .datapoint-card__summary {
+    grid-template-columns: 1fr;
+  }
+
+  .room-page__header {
+    grid-template-columns: 1fr;
+  }
+
+  .room-page__content {
     grid-template-columns: 1fr;
   }
 }

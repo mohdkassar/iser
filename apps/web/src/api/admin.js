@@ -28,8 +28,20 @@ export const adminApi = {
     }),
     runClustering: (siteId) => request(`/api/admin/sites/${siteId}/clusters/run`, { method: "POST" }),
     clearSiteClustersAndMetadata: (siteId) => request(`/api/admin/sites/${siteId}/clusters/clear`, { method: "POST" }),
+    generateSyntheticTelemetry: (siteId, body) => request(`/api/admin/sites/${siteId}/telemetry/generate`, {
+        method: "POST",
+        body: JSON.stringify(body),
+    }),
+    askRoomAgent: (siteId, clusterId, body) => request(`/api/admin/sites/${siteId}/rooms/${clusterId}/agent`, {
+        method: "POST",
+        body: JSON.stringify(body),
+    }),
     updateCluster: (clusterId, body) => request(`/api/admin/clusters/${clusterId}`, {
         method: "PATCH",
+        body: JSON.stringify(body),
+    }),
+    mergeRoomClusters: (clusterId, body) => request(`/api/admin/clusters/${clusterId}/merge`, {
+        method: "POST",
         body: JSON.stringify(body),
     }),
 };

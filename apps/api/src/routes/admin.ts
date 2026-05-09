@@ -1,15 +1,18 @@
 import { Router } from "express";
 
 import {
+  askRoomAgent,
   clearSiteClustersAndMetadata,
   extractSiteMetadata,
   getClientDetail,
   getSiteDetail,
   listClients,
   runDeviceClustering,
+  generateSyntheticTelemetry,
   runRoomClustering,
   runClustering,
   updateCluster,
+  mergeRoomClusters,
 } from "../services/admin-service.js";
 
 export const adminRouter = Router();
@@ -102,6 +105,38 @@ adminRouter.post("/sites/:siteId/clusters/clear", async (request, response) => {
   response.json(result);
 });
 
+adminRouter.post("/sites/:siteId/telemetry/generate", async (request, response) => {
+  try {
+    const result = await generateSyntheticTelemetry(request.params.siteId, request.body);
+    if (!result) {
+      response.status(404).json({ message: "Site not found" });
+      return;
+    }
+
+    response.status(201).json(result);
+  } catch (error) {
+    response
+      .status(400)
+      .json({ message: error instanceof Error ? error.message : "Failed to generate telemetry" });
+  }
+});
+
+adminRouter.post("/sites/:siteId/rooms/:clusterId/agent", async (request, response) => {
+  try {
+    const result = await askRoomAgent(request.params.siteId, request.params.clusterId, request.body);
+    if (!result) {
+      response.status(404).json({ message: "Room not found" });
+      return;
+    }
+
+    response.status(201).json(result);
+  } catch (error) {
+    response
+      .status(400)
+      .json({ message: error instanceof Error ? error.message : "Failed to run room agent" });
+  }
+});
+
 adminRouter.patch("/clusters/:clusterId", async (request, response) => {
   const result = await updateCluster(request.params.clusterId, request.body);
   if (!result) {
@@ -110,4 +145,24 @@ adminRouter.patch("/clusters/:clusterId", async (request, response) => {
   }
 
   response.json(result);
+});
+
+adminRouter.post("/clusters/:clusterId/merge", async (request, response) => {
+  const sourceClusterId = typeof request.body?.sourceClusterId === "string" ? request.body.sourceClusterId : "";
+  if (!sourceClusterId) {
+    response.status(400).json({ message: "sourceClusterId is required" });
+    return;
+  }
+
+  try {
+    const result = await mergeRoomClusters(request.params.clusterId, { sourceClusterId });
+    if (!result) {
+      response.status(404).json({ message: "Cluster not found" });
+      return;
+    }
+
+    response.json(result);
+  } catch (error) {
+    response.status(400).json({ message: error instanceof Error ? error.message : "Failed to merge clusters" });
+  }
 });

@@ -21,7 +21,11 @@ function heuristicExtract(rawName: string): ExtractedMetadata {
   const zoneToken = tokens.find((token) => /^z\d+$/i.test(token));
   const tempToken = tokens.find((token) => /(temp|temperature|humidity|pressure|co2)/.test(token));
 
+  const nameParts = [roomToken, ahuToken, tempToken].filter(Boolean);
+  const humanReadableName = nameParts.length > 0 ? nameParts.join(" ") : rawName;
+
   return {
+    humanReadableName,
     roomCandidate: roomToken ?? fallbackToken,
     roomAliases: roomToken ? [roomToken, roomToken.replace("grow", "grm")] : [],
     equipmentGroup: ahuToken ?? fallbackToken,
@@ -80,6 +84,13 @@ Important principles:
 7. If no reliable room evidence exists, set room_candidate to "unknown" and room_aliases to [].
 
 Field definitions:
+- human_readable_name:
+  A short, clear, human-friendly label that describes what this datapoint measures or controls.
+  It should be understandable by someone with no knowledge of the raw naming scheme.
+  Use natural language in Title Case.
+  Good examples: "Grow Room A Supply Air Temperature", "AHU-1 Return Air Humidity", "Room 3 CO2 Sensor"
+  Bad examples: "grma_sat", "unknown", "ahu1_rh"
+
 - room_candidate:
   The most likely normalized identifier of the physical room or grow room referenced by the datapoint.
   This must refer only to location/room identity.
@@ -146,6 +157,7 @@ Return only valid JSON matching the schema.
           type: "object",
           additionalProperties: false,
           required: [
+            "humanReadableName",
             "roomCandidate",
             "roomAliases",
             "equipmentGroup",
@@ -155,6 +167,7 @@ Return only valid JSON matching the schema.
             "confidence",
           ],
           properties: {
+            humanReadableName: { type: "string" },
             roomCandidate: { type: "string" },
             roomAliases: { type: "array", items: { type: "string" } },
             equipmentGroup: { type: "string" },
@@ -205,10 +218,12 @@ export async function extractMetadataBatch(datapoints: BatchedDatapointInput[]) 
             type: "input_text",
             text:
               "You are extracting structured metadata from industrial IoT datapoints in batches. " +
-              "Return JSON with a datapoints array. Each item must include identifier, roomCandidate, roomAliases, " +
+              "Return JSON with a datapoints array. Each item must include identifier, humanReadableName, roomCandidate, roomAliases, " +
               "equipmentGroup, deviceInstance, deviceType, subzone, confidence. " +
+              "humanReadableName is a short, clear, human-friendly label in Title Case that describes what this datapoint measures or controls " +
+              "(e.g. \"Grow Room A Supply Air Temperature\", \"AHU-1 Return Air Humidity\"). " +
               "Use only evidence in each datapoint plus neighboring context in the batch. " +
-              "Do not mix identifiers or invent unsupported aliases. Use lowercase snake_case for scalar string values.",
+              "Do not mix identifiers or invent unsupported aliases. Use lowercase snake_case for scalar string values (except humanReadableName which uses Title Case).",
           },
         ],
       },
@@ -238,6 +253,7 @@ export async function extractMetadataBatch(datapoints: BatchedDatapointInput[]) 
                 additionalProperties: false,
                 required: [
                   "identifier",
+                  "humanReadableName",
                   "roomCandidate",
                   "roomAliases",
                   "equipmentGroup",
@@ -248,6 +264,7 @@ export async function extractMetadataBatch(datapoints: BatchedDatapointInput[]) 
                 ],
                 properties: {
                   identifier: { type: "string" },
+                  humanReadableName: { type: "string" },
                   roomCandidate: { type: "string" },
                   roomAliases: { type: "array", items: { type: "string" } },
                   equipmentGroup: { type: "string" },
@@ -284,6 +301,7 @@ export async function extractMetadataBatch(datapoints: BatchedDatapointInput[]) 
 
   parsed.datapoints.forEach((item) => {
     results[item.identifier] = {
+      humanReadableName: item.humanReadableName,
       roomCandidate: item.roomCandidate,
       roomAliases: item.roomAliases,
       equipmentGroup: item.equipmentGroup,
@@ -311,6 +329,7 @@ export async function extractRoomMetadataBatch(datapoints: BatchedDatapointInput
           return [
             datapoint.identifier,
             {
+              humanReadableName: metadata.humanReadableName,
               roomCandidate: metadata.roomCandidate,
               roomAliases: metadata.roomAliases,
               confidence: metadata.confidence,
@@ -333,7 +352,9 @@ export async function extractRoomMetadataBatch(datapoints: BatchedDatapointInput
             text:
               "You are extracting only room-identification metadata from industrial IoT datapoints in batches. " +
               "Focus on physical room identity and aliases only. Return JSON with a datapoints array. " +
-              "Each item must include identifier, roomCandidate, roomAliases, confidence. " +
+              "Each item must include identifier, humanReadableName, roomCandidate, roomAliases, confidence. " +
+              "humanReadableName is a short, clear, human-friendly label in Title Case that describes what this datapoint measures or controls " +
+              "(e.g. \"Grow Room A Supply Air Temperature\", \"AHU-1 Return Air Humidity\"). " +
               "Do not return equipment, device, signal, or subzone metadata. " +
               "Use neighboring datapoints only to resolve room naming patterns. Do not invent aliases.",
           },
@@ -363,9 +384,10 @@ export async function extractRoomMetadataBatch(datapoints: BatchedDatapointInput
               items: {
                 type: "object",
                 additionalProperties: false,
-                required: ["identifier", "roomCandidate", "roomAliases", "confidence"],
+                required: ["identifier", "humanReadableName", "roomCandidate", "roomAliases", "confidence"],
                 properties: {
                   identifier: { type: "string" },
+                  humanReadableName: { type: "string" },
                   roomCandidate: { type: "string" },
                   roomAliases: { type: "array", items: { type: "string" } },
                   confidence: { type: "number" },
@@ -384,6 +406,7 @@ export async function extractRoomMetadataBatch(datapoints: BatchedDatapointInput
       return [
         datapoint.identifier,
         {
+          humanReadableName: metadata.humanReadableName,
           roomCandidate: metadata.roomCandidate,
           roomAliases: metadata.roomAliases,
           confidence: metadata.confidence,
@@ -403,6 +426,7 @@ export async function extractRoomMetadataBatch(datapoints: BatchedDatapointInput
   const parsed = JSON.parse(text) as {
     datapoints: Array<{
       identifier: string;
+      humanReadableName: string;
       roomCandidate: string;
       roomAliases: string[];
       confidence: number;
@@ -412,6 +436,7 @@ export async function extractRoomMetadataBatch(datapoints: BatchedDatapointInput
   const results = { ...fallbackResults };
   parsed.datapoints.forEach((item) => {
     results[item.identifier] = {
+      humanReadableName: item.humanReadableName,
       roomCandidate: item.roomCandidate,
       roomAliases: item.roomAliases,
       confidence: item.confidence,

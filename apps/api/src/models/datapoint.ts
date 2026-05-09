@@ -2,6 +2,7 @@ import { Schema, Types, model } from "mongoose";
 
 const extractedMetadataSchema = new Schema(
   {
+    humanReadableName: String,
     roomCandidate: String,
     roomAliases: [String],
     equipmentGroup: String,

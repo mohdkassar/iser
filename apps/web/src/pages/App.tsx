@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import type { ClusterStatus, ClusterType, MetadataExtractionVersion } from "@iser/shared";
+import { Link } from "react-router-dom";
 
 import { ClusterCard } from "../components/ClusterCard";
 import { Panel } from "../components/Panel";
@@ -27,6 +28,7 @@ export function App() {
     runRoomClustering,
     clearSiteClustersAndMetadata,
     updateCluster,
+    mergeRoomClusters,
   } = useAdminData();
   const [clusterStatusFilter, setClusterStatusFilter] = useState<"all" | ClusterStatus>("all");
   const [clusterTypeFilter, setClusterTypeFilter] = useState<"all" | ClusterType>("all");
@@ -36,6 +38,7 @@ export function App() {
   const [metadataBatchSize, setMetadataBatchSize] = useState(5);
   const [datapointSearch, setDatapointSearch] = useState("");
   const [roomClusteringThreshold, setRoomClusteringThreshold] = useState(0.5);
+  const [draggingClusterId, setDraggingClusterId] = useState<string | null>(null);
 
   const filteredDatapoints = useMemo(() => {
     const datapoints = siteDetail?.datapoints ?? [];
@@ -50,6 +53,7 @@ export function App() {
         datapoint.rawName,
         datapoint.identifier,
         datapoint.manufacturer,
+        datapoint.metadata?.humanReadableName,
         datapoint.metadata?.roomCandidate,
         datapoint.metadata?.roomAliases.join(" "),
         datapoint.metadata?.equipmentGroup,
@@ -89,6 +93,9 @@ export function App() {
         </div>
         <div className="hero__status">
           <span className="status-pill">{isPending ? "Loading" : "Ready"}</span>
+          <Link className="secondary-button" to="/telemetry">
+            Synthetic telemetry
+          </Link>
           {error ? <span className="status-pill status-pill--error">{error}</span> : null}
         </div>
       </section>
@@ -218,7 +225,8 @@ export function App() {
               >
                 <div className="datapoint-card__summary">
                   <div className="datapoint-card__primary">
-                    <strong>{datapoint.rawName}</strong>
+                    <strong>{datapoint.metadata?.humanReadableName ?? datapoint.rawName}</strong>
+                    <span>{datapoint.rawName}</span>
                     <span>{datapoint.identifier}</span>
                     <small>{datapoint.manufacturer}</small>
                   </div>
@@ -347,18 +355,22 @@ export function App() {
             </label>
           </div>
           <div className="cluster-grid">
-            {filteredClusters.map((cluster) => (
-              <ClusterCard
-                key={cluster.id}
-                cluster={cluster}
-                datapoints={
-                  siteDetail?.datapoints.filter((datapoint) => cluster.datapointIds.includes(datapoint.id)) ?? []
-                }
-                onApprove={() => updateCluster(cluster.id, "approved")}
-                onReject={() => updateCluster(cluster.id, "rejected")}
-                onRename={(label) => updateCluster(cluster.id, undefined, label)}
-              />
-            ))}
+              {filteredClusters.map((cluster) => (
+                <ClusterCard
+                  key={cluster.id}
+                  cluster={cluster}
+                  datapoints={
+                    siteDetail?.datapoints.filter((datapoint) => cluster.datapointIds.includes(datapoint.id)) ?? []
+                  }
+                  onApprove={() => updateCluster(cluster.id, "approved")}
+                  onReject={() => updateCluster(cluster.id, "rejected")}
+                  onRename={(label) => updateCluster(cluster.id, undefined, label)}
+                  onMerge={mergeRoomClusters}
+                  draggingClusterId={draggingClusterId}
+                  onDragStart={setDraggingClusterId}
+                  onDragEnd={() => setDraggingClusterId(null)}
+                />
+              ))}
             {siteDetail && filteredClusters.length === 0 ? (
               <p className="empty-state">No clusters match the current filters.</p>
             ) : null}

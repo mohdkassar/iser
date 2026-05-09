@@ -160,6 +160,16 @@ export function useAdminData() {
     await refreshSite();
   }
 
+  async function mergeRoomClusters(targetClusterId: string, sourceClusterId: string) {
+    if (!selectedSiteId) return;
+
+    await adminApi.mergeRoomClusters(targetClusterId, {
+      sourceClusterId,
+    });
+    await refreshClient();
+    await refreshSite();
+  }
+
   return {
     clients,
     clientDetail,
@@ -178,5 +188,6 @@ export function useAdminData() {
     runClustering,
     clearSiteClustersAndMetadata,
     updateCluster,
+    mergeRoomClusters,
   };
 }
